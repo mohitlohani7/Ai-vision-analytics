@@ -1,0 +1,9 @@
+streamlit
+ultralytics
+opencv-python
+matplotlib
+reportlab
+numpy
+lapx
+groq
+openai
