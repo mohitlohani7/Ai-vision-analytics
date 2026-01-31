@@ -7,3 +7,7 @@ numpy
 lapx
 groq
 openai
+numpy
+opencv-python
+torch
+torchvision
