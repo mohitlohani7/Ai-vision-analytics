@@ -20,3 +20,4 @@ openai
 reportlab
 matplotlib
 opencv-python
+opencv
