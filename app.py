@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import cv2
 import numpy as np
 from PIL import Image
 from video_processor import analyze_video, analyze_image, process_live_frame
