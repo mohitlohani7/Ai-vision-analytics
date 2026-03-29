@@ -19,3 +19,4 @@ groq
 openai
 reportlab
 matplotlib
+opencv-python
