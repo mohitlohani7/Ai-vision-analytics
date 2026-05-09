@@ -15,7 +15,7 @@ from openai import OpenAI
 # CONFIGURATION & ASSETS
 # --------------------------------------------------
 COMPANY_HEADER_BG = r"L:\Object detection\blue.png"
-COMPANY_LOGO = r"L:\Object detection\Sriya_new_logo.png"
+COMPANY_LOGO = r"L:\Object detection\Mohit_Logo.png"
 
 # Brand Colors
 PRIMARY_BLUE = colors.HexColor("#1e3c72")
