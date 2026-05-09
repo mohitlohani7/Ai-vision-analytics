@@ -61,6 +61,11 @@ with st.sidebar:
         except:
             st.error("❌ Invalid API Key")
 
+    # Branding / Developer Info
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("👨‍💻 Developed by")
+    st.sidebar.info("Mohit Lohani")
+
 # -----------------------------------------------------------------------------
 # 4. MAIN TITLE
 # -----------------------------------------------------------------------------
@@ -134,68 +139,84 @@ else:
         with open(file_path, "wb") as f:
             f.write(uploaded_file.read())
 
-        st.success("File uploaded")
+        st.success("File uploaded successfully!")
 
-        if st.button("Start Analysis"):
+        if st.button("🚀 Start Analysis"):
 
-            with st.spinner("Processing..."):
+            with st.spinner("Bhai ruko, AI dimaag laga raha hai..."):
 
                 try:
                     if file_type == "video":
                         output_path = file_path.replace(".mp4", "_out.mp4")
-                        analytics, duration = analyze_video(file_path, output_path, None)
+                        result = analyze_video(file_path, output_path, None)
                     else:
                         output_path = file_path.replace(".jpg", "_out.jpg")
-                        analytics, duration = analyze_image(file_path, output_path)
+                        result = analyze_image(file_path, output_path)
 
+                    # Result validation to prevent crashes
+                    if result and len(result) == 2:
+                        analytics, duration = result
+
+                        if analytics and "class_count" in analytics:
+                            st.session_state.analytics = analytics
+                            st.session_state.duration = duration
+                            st.session_state.output_path = output_path
+                            st.session_state.file_type = file_type
+                            st.session_state.processed = True
+
+                            graph_path = os.path.join("temp", f"{file_id}_graph.png")
+                            generate_class_graph(analytics["class_count"], graph_path)
+                            st.session_state.graph_path = graph_path
+                            
+                            st.balloons() # Swag factor
+                            st.success("Analysis Complete!")
+                        else:
+                            st.error("Model ne kuch detect nahi kiya. Doosri file try kar bhai.")   
+                    else:
+                        st.error("Processing mein gadbad hui. Result format galat hai.")
+                
                 except Exception as e:
-                    st.error(f"Error: {str(e)}")
-                    analytics = None
-
-                if analytics:
-                    st.session_state.analytics = analytics
-                    st.session_state.duration = duration
-                    st.session_state.output_path = output_path
-                    st.session_state.file_type = file_type
-                    st.session_state.processed = True
-
-                    graph_path = os.path.join("temp", f"{file_id}_graph.png")
-                    generate_class_graph(analytics["class_count"], graph_path)
-
-                    st.session_state.graph_path = graph_path
+                    st.error(f"System Error: {str(e)}")
+                    st.session_state.processed = False
 
 # -----------------------------------------------------------------------------
 # 7. RESULTS
 # -----------------------------------------------------------------------------
 if st.session_state.processed:
 
-    st.subheader("Results")
+    st.divider()
+    st.subheader("📊 Analysis Results")
 
     analytics = st.session_state.analytics
 
     total = sum(analytics["class_count"].values())
-    st.metric("Total Objects", total)
+    st.metric("Total Objects Detected", total)
 
-    # Output
-    if st.session_state.file_type == "video":
-        st.video(st.session_state.output_path)
-    else:
-        st.image(st.session_state.output_path)
+    col1, col2 = st.columns(2)
 
-    # Graph
-    if "graph_path" in st.session_state:
-        st.image(st.session_state.graph_path)
+    with col1:
+        st.write("### 🎥 Processed Output")
+        if st.session_state.file_type == "video":
+            st.video(st.session_state.output_path)
+        else:
+            st.image(st.session_state.output_path)
+
+    with col2:
+        st.write("### 📈 Data Visualization")
+        if "graph_path" in st.session_state:
+            st.image(st.session_state.graph_path)
 
     # -----------------------------------------------------------------------------
     # 8. PDF REPORT
     # -----------------------------------------------------------------------------
-    if st.button("Generate PDF Report"):
+    st.divider()
+    if st.button("📄 Generate PDF Report"):
 
         if not api_key:
-            st.warning("API key required")
+            st.warning("Bhai, bina API key ke report nahi ban payegi!")
             st.stop()
 
-        with st.spinner("Generating report..."):
+        with st.spinner("AI Report generate kar raha hai..."):
 
             try:
                 ai_text = get_ai_summary(
@@ -217,7 +238,7 @@ if st.session_state.processed:
                 )
 
                 with open(report_path, "rb") as f:
-                    st.download_button("Download Report", f, "report.pdf")
+                    st.download_button("⬇️ Download Report", f, "Mohit_Lohani_Report.pdf")
 
             except Exception as e:
                 st.error(f"Report Error: {str(e)}")
